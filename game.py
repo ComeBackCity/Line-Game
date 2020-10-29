@@ -5,8 +5,7 @@ from queue import Queue
 
 pygame.init()
 
-#mode = int(sys.argv[1])
-mode = 6
+mode = int(sys.argv[1])
 
 #screen_layout
 screen_size = 1000 if mode == 8 else 800
