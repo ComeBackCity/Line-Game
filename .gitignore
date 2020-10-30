@@ -1,2 +1,5 @@
 test.py
-__pychache__/linegame.cpython-36.pyc
+__pychache__/
+test.cpp
+test.sh
+test

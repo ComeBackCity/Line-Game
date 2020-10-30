@@ -105,8 +105,8 @@ pygame.display.set_caption('Line Game')
 
 gameExit = False
 gameStarted = False
-turn = 1
-opposite = 2
+turn = 2
+opposite = 1
 a = b = 0
 
 while not gameExit:
