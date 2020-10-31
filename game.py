@@ -2,6 +2,7 @@ import pygame
 import math
 import sys
 from queue import Queue
+from sys import stderr
 
 pygame.init()
 
@@ -71,18 +72,18 @@ def p2Count():
 
 def bfs(x, y, p):
     length = 0
-    q = Queue(maxsize=mode*2)
+    q = []
     d = dict()
-    q.put((x,y))
-    while not q.empty():
-        (a, b) = q.get()
+    q.append((x,y))
+    while len(q) != 0:
+        (a, b) = q.pop(0)
         if d.get((a,b)) is None:
             d[(a,b)] = True
             length += 1
         for move in moves:
             if 0 <= a+ move[0] < mode and 0 <= b+move[1] < mode:
                 if board[a+move[0]][b+move[1]] == p and d.get((a+move[0],b+move[1])) is None:
-                    q.put((a+move[0], b+move[1]))
+                    q.append((a+move[0], b+move[1]))
     return length
                 
 
@@ -105,11 +106,28 @@ pygame.display.set_caption('Line Game')
 
 gameExit = False
 gameStarted = False
+move_from = (-1,-1)
+move_to = (-2,-2)
+opp_from = (-1, -1)
+opp_to = (-2, -2)
+me = 1
+opponent = 2
 turn = 2
 opposite = 1
 a = b = 0
 
 while not gameExit:
+    if turn == opponent:
+        print("{} {} {} {}".format(move_from[0], move_from[1], move_to[0], move_to[1]))
+        a = int(input())
+        b = int(input())
+        c = int(input())
+        d = int(input())
+        opp_from = (a, b)
+        opp_to = (c, d)
+        board[a][b] = 0
+        board[c][d] = opponent
+        turn, opposite = opposite, turn
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             gameExit = True
@@ -118,6 +136,10 @@ while not gameExit:
             if valid_click(mouse_pos, boundary_top, boundary_bottom):
                 x1 = int(math.floor(mouse_pos[0]/100)) 
                 y1 = int(math.floor(mouse_pos[1]/100))
+                if turn == 2 or turn == 1:
+                    move_from = (y1-1,x1-1)
+                if turn == 1.5 or turn == 0.5:
+                    move_to = (y1-1,x1-1)
                 if board[y1-1][x1-1] == turn:
                     horizontal = 0
                     vertical = 0
@@ -318,7 +340,7 @@ while not gameExit:
                     opposite = 1
                 else:
                     turn = 1
-                    opposite = 2
+                    opposite = 2                
                     
     base = (screen_size-200)/mode
 
@@ -343,10 +365,6 @@ while not gameExit:
             elif board2[i][j] == 1.5:
                 pygame.draw.circle(gameDisplay, YELLOW, ((j+1) * 100 + 50, (i+1) * 100 + 50) , 35)
 
-    #pygame.draw.circle(gameDisplay, P1, pos , 35)
-    # if to_move is True:
-    #     for move in move_pos:
-    #         pygame.draw.circle(gameDisplay, GREEN, move , 35)
     pygame.display.update()
     if not gameStarted:
         gameStarted = True
