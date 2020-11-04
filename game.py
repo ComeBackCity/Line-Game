@@ -51,23 +51,12 @@ def valid_click(m_pos, top, bottom):
     else:
         return True
 
-def p1Count():
+def playerCount(playerVal):
     count = 0
     first = (999, 999)
     for i in range(mode):
         for j in range(mode):
-            if board[i][j] == 1:
-                count += 1
-                if i < first[0] and j < first[0]:
-                    first = (i, j)
-    return (count, first[0], first[1])
-
-def p2Count():
-    count = 0
-    first = (999, 999)
-    for i in range(mode):
-        for j in range(mode):
-            if board[i][j] == 2:
+            if board[i][j] == playerVal:
                 count += 1
                 if i < first[0] and j < first[0]:
                     first = (i, j)
@@ -91,8 +80,8 @@ def bfs(x, y, p):
                 
 
 def winCheck():
-    (c1, x1, y1) = p1Count()
-    (c2, x2, y2) = p2Count()
+    (c1, x1, y1) = playerCount(1)
+    (c2, x2, y2) = playerCount(2)
 
     l1 = bfs(x1, y1, 1)
     l2 = bfs(x2, y2, 2)
@@ -115,8 +104,6 @@ opp_from = (-1, -1)
 opp_to = (-2, -2)
 me = int(sys.argv[3])
 opponent = int(sys.argv[4])
-# turn = int(sys.argv[3])
-# opposite = int(sys.argv[4])
 turn = 2
 opposite = 1
 a = b = 0
