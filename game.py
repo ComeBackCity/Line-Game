@@ -7,6 +7,8 @@ from sys import stderr
 pygame.init()
 
 mode = int(sys.argv[1])
+arg2 = int(sys.argv[2])
+pve = True if arg2 == 1 else False
 
 #screen_layout
 screen_size = 1000 if mode == 8 else 800
@@ -110,24 +112,28 @@ move_from = (-1,-1)
 move_to = (-2,-2)
 opp_from = (-1, -1)
 opp_to = (-2, -2)
-me = 1
-opponent = 2
+me = int(sys.argv[3])
+opponent = int(sys.argv[4])
+# turn = int(sys.argv[3])
+# opposite = int(sys.argv[4])
 turn = 2
 opposite = 1
 a = b = 0
+loop_breaker = False
 
 while not gameExit:
-    if turn == opponent:
-        print("{} {} {} {}".format(move_from[0], move_from[1], move_to[0], move_to[1]))
-        a = int(input())
-        b = int(input())
-        c = int(input())
-        d = int(input())
-        opp_from = (a, b)
-        opp_to = (c, d)
-        board[a][b] = 0
-        board[c][d] = opponent
-        turn, opposite = opposite, turn
+    if pve:
+        if turn == opponent:
+            print("{} {} {} {}".format(move_from[0], move_from[1], move_to[0], move_to[1]))
+            a = int(input())
+            b = int(input())
+            c = int(input())
+            d = int(input())
+            opp_from = (a, b)
+            opp_to = (c, d)
+            board[a][b] = 0
+            board[c][d] = opponent
+            turn, opposite = opposite, turn
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             gameExit = True
@@ -198,6 +204,8 @@ while not gameExit:
                     if board[s2[0]][s2[1]] != 0:
                         secondary += 1
 
+                    move_count = 0
+
                     #horizontal
                     valid = True
                     for j in range(1,horizontal+1):
@@ -212,6 +220,7 @@ while not gameExit:
                             break
                     
                     if valid:
+                        move_count += 1
                         board2[y1-1][x1-1+horizontal] = board[y1-1][x1-1] - 0.5
 
                     valid = True
@@ -227,6 +236,7 @@ while not gameExit:
                             break
 
                     if valid:
+                        move_count += 1
                         board2[y1-1][x1-1-horizontal] = board[y1-1][x1-1] - 0.5
 
                     #vertical
@@ -243,6 +253,7 @@ while not gameExit:
                             break
 
                     if valid:
+                        move_count += 1
                         board2[y1-1+vertical][x1-1] = board[y1-1][x1-1] - 0.5
 
                     valid = True
@@ -258,6 +269,7 @@ while not gameExit:
                             break
 
                     if valid:
+                        move_count += 1
                         board2[y1-1-vertical][x1-1] = board[y1-1][x1-1] - 0.5
 
                     #primary
@@ -274,6 +286,7 @@ while not gameExit:
                             break
 
                     if valid:
+                        move_count += 1
                         board2[y1-1-primary][x1-1-primary] = board[y1-1][x1-1] - 0.5
 
                     valid = True
@@ -289,6 +302,7 @@ while not gameExit:
                             break
 
                     if valid:
+                        move_count += 1
                         board2[y1-1+primary][x1-1+primary] = board[y1-1][x1-1] - 0.5
 
                     #secondary
@@ -305,6 +319,7 @@ while not gameExit:
                             break
                     
                     if valid:
+                        move_count += 1
                         board2[y1-1+secondary][x1-1-secondary] = board[y1-1][x1-1] - 0.5
 
                     valid = True
@@ -320,7 +335,12 @@ while not gameExit:
                             break
 
                     if valid:
+                        move_count += 1
                         board2[y1-1-secondary][x1-1+secondary] = board[y1-1][x1-1] - 0.5
+
+                    if move_count == 0:
+                        loop_breaker = True
+                        break
 
                     a = y1-1
                     b = x1-1
@@ -342,6 +362,10 @@ while not gameExit:
                     turn = 1
                     opposite = 2                
                     
+    if loop_breaker:
+        loop_breaker = False
+        continue
+
     base = (screen_size-200)/mode
 
     gameDisplay.fill(BackgroundColor)

@@ -2,13 +2,14 @@
 #define pii pair<int, int>
 #define NINF -9999
 #define PINF 9999
-#define SEARCH_DEPTH 5
 
 using namespace std;
 
-int mode = 8, turn = 2, opponent = 1;
+int SEARCH_DEPTH, mode;
+int turn, opponent;
+//int turn = 2, opponent = 1;
 
-int pieceSquareTable[8][8] = {
+int pieceSquareTableInitial[8][8] = {
     {-80, -25, -20, -20, -20, -20, -25, -80},
     {-25, 10, 10, 10, 10, 10, 10, -25},
     {-20, 10, 25, 25, 25, 25, 10, -20},
@@ -18,20 +19,12 @@ int pieceSquareTable[8][8] = {
     {-25, 10, 10, 10, 10, 10, 10, -25},
     {-80, -25, -20, -20, -20, -20, -25, -80}};
 
-int board[8][8] = {
-    {0, 2, 2, 2, 2, 2, 2, 0},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {0, 2, 2, 2, 2, 2, 2, 0}};
+vector<vector<int>> board;
+vector<vector<int>> pieceSquareTable;
 
 int _move[2][2] = {
     {-1, -1},
-    {-2, -2}
-};
+    {-2, -2}};
 
 vector<pii> findMoves(int x, int y)
 {
@@ -93,132 +86,156 @@ vector<pii> findMoves(int x, int y)
     //finding valid moves
     //horizontal
     bool valid = true;
-    for (int i = 1; i <= horizontal; i++)
+    if (y + horizontal < mode)
     {
-        if ((y + i >= mode) || (i != horizontal && board[x][y + i] == opponent) || (i == horizontal && board[x][y + i] == turn))
+        valid = true;
+        for (int i = 1; i <= horizontal; i++)
         {
-            valid = false;
-            break;
+            if ((i != horizontal && board[x][y + i] == opponent) || (i == horizontal && board[x][y + i] == turn))
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid)
+        {
+            moves.push_back(make_pair(x, y + horizontal));
         }
     }
 
-    if (valid)
+    if (y - horizontal >= 0)
     {
-        moves.push_back(make_pair(x, y + horizontal));
-    }
-
-    valid = true;
-    for (int i = 1; i <= horizontal; i++)
-    {
-        if ((y - i < 0) || (i != horizontal && board[x][y - i] == opponent) || (i == horizontal && board[x][y - i] == turn))
+        valid = true;
+        for (int i = 1; i <= horizontal; i++)
         {
-            valid = false;
-            break;
+            if ((i != horizontal && board[x][y - i] == opponent) || (i == horizontal && board[x][y - i] == turn))
+            {
+                valid = false;
+                break;
+            }
         }
-    }
 
-    if (valid)
-    {
-        moves.push_back(make_pair(x, y - horizontal));
+        if (valid)
+        {
+            moves.push_back(make_pair(x, y - horizontal));
+        }
     }
 
     //vertical
-    valid = true;
-    for (int i = 1; i <= vertical; i++)
+    if (x + vertical < mode)
     {
-        if ((x + i >= mode) || (i != vertical && board[x + i][y] == opponent) || (i == vertical && board[x + i][y] == turn))
+        valid = true;
+        for (int i = 1; i <= vertical; i++)
         {
-            valid = false;
-            break;
+            if ((i != vertical && board[x + i][y] == opponent) || (i == vertical && board[x + i][y] == turn))
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid)
+        {
+            moves.push_back(make_pair(x + vertical, y));
         }
     }
 
-    if (valid)
+    if (x - vertical >= 0)
     {
-        moves.push_back(make_pair(x + vertical, y));
-    }
-
-    valid = true;
-    for (int i = 1; i <= vertical; i++)
-    {
-        if ((x - i < 0) || (i != vertical && board[x - i][y] == opponent) || (i == vertical && board[x - i][y] == turn))
+        valid = true;
+        for (int i = 1; i <= vertical; i++)
         {
-            valid = false;
-            break;
+            if ((i != vertical && board[x - i][y] == opponent) || (i == vertical && board[x - i][y] == turn))
+            {
+                valid = false;
+                break;
+            }
         }
-    }
 
-    if (valid)
-    {
-        moves.push_back(make_pair(x - vertical, y));
+        if (valid)
+        {
+            moves.push_back(make_pair(x - vertical, y));
+        }
     }
 
     //primary
     valid = true;
-    for (int i = 1; i <= primary; i++)
+    if (x + primary < mode && y + primary < mode)
     {
-        if ((x + i >= mode || y + i >= mode) || (i != primary && board[x + i][y + i] ==opponent) || (i == primary && board[x + i][y + i] == turn))
+        for (int i = 1; i <= primary; i++)
         {
-            valid = false;
-            break;
+            if ((i != primary && board[x + i][y + i] == opponent) || (i == primary && board[x + i][y + i] == turn))
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid)
+        {
+            moves.push_back(make_pair(x + primary, y + primary));
         }
     }
 
-    if (valid)
+    if (x - primary >= 0 && y - primary >= 0)
     {
-        moves.push_back(make_pair(x + primary, y + primary));
-    }
-
-    valid = true;
-    for (int i = 1; i <= primary; i++)
-    {
-        if ((x - i < 0 || y - i < 0) || (i != primary && board[x - i][y - i] == opponent) || (i == primary && board[x - i][y - i] == turn))
+        valid = true;
+        for (int i = 1; i <= primary; i++)
         {
-            valid = false;
-            break;
+            if ((i != primary && board[x - i][y - i] == opponent) || (i == primary && board[x - i][y - i] == turn))
+            {
+                valid = false;
+                break;
+            }
         }
-    }
 
-    if (valid)
-    {
-        moves.push_back(make_pair(x - primary, y - primary));
+        if (valid)
+        {
+            moves.push_back(make_pair(x - primary, y - primary));
+        }
     }
 
     //secondary
-    valid = true;
-    for (int i = 1; i <= secondary; i++)
+    if (x - secondary >= 0 && y + secondary < mode)
     {
-        if ((x - i < 0 || y + i >= mode) || (i != secondary && board[x - i][y + i] == opponent) || (i == secondary && board[x - i][y + i] == turn))
+        valid = true;
+        for (int i = 1; i <= secondary; i++)
         {
-            valid = false;
-            break;
+            if ((i != secondary && board[x - i][y + i] == opponent) || (i == secondary && board[x - i][y + i] == turn))
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid)
+        {
+            moves.push_back(make_pair(x - secondary, y + secondary));
         }
     }
 
-    if (valid)
+    if (x + secondary < mode && y - secondary >= 0)
     {
-        moves.push_back(make_pair(x - secondary, y + secondary));
-    }
-
-    valid = true;
-    for (int i = 1; i <= secondary; i++)
-    {
-        if ((x + i >= mode || y - i < 0) || (i != secondary && board[x + i][y - i] == opponent) || (i == secondary && board[x + i][y - i] == turn))
+        valid = true;
+        for (int i = 1; i <= secondary; i++)
         {
-            valid = false;
-            break;
+            if ((i != secondary && board[x + i][y - i] == opponent) || (i == secondary && board[x + i][y - i] == turn))
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid)
+        {
+            moves.push_back(make_pair(x + secondary, y - secondary));
         }
     }
-
-    if (valid)
-    {
-        moves.push_back(make_pair(x + secondary, y - secondary));
-    }
-
     return moves;
 }
 
-int evalFunction()
+int pieceSquareHeuristic()
 {
     int eval = 0, player1val = 0, player2val = 0;
     for (int i = 0; i < mode; i++)
@@ -239,11 +256,17 @@ int evalFunction()
     return eval;
 }
 
+int evalFunction()
+{
+    int eval = pieceSquareHeuristic();
+    return eval;
+}
+
 void boardPrint()
 {
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < mode; i++)
     {
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < mode; j++)
         {
             cerr << board[i][j] << " ";
         }
@@ -254,9 +277,9 @@ void boardPrint()
 vector<pair<pii, vector<pii>>> childGen()
 {
     vector<pair<pii, vector<pii>>> children;
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < mode; i++)
     {
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < mode; j++)
         {
             if (board[i][j] == turn)
             {
@@ -271,16 +294,14 @@ vector<pair<pii, vector<pii>>> childGen()
 
 int minimax(int depth, bool maximizing, int alpha, int beta)
 {
-    if (depth == 0){
+    if (depth == 0)
+    {
         int a = evalFunction();
-        /*cout << "Here1 at depth " << depth << endl;
-        cout << a << endl;*/
         return a;
     }
 
     if (maximizing)
     {
-        //cout << "Here1 at depth " << depth << endl;
         int bestVal = NINF;
         vector<pair<pii, vector<pii>>> children = childGen();
         int value;
@@ -289,21 +310,20 @@ int minimax(int depth, bool maximizing, int alpha, int beta)
             bool breakLoop = false;
             pair<pii, vector<pii>> a = children[i];
             pii source = a.first;
-            //cout << "Sorce: " << source.first << " " << source.second << endl;
             vector<pii> moves = a.second;
             for (int j = 0; j < moves.size(); j++)
             {
                 bool capture = false;
                 pii dest = moves[j];
-                //cout << "Dest: " << dest.first << " " << dest.second << endl;
                 board[source.first][source.second] = 0;
-                if(board[dest.first][dest.second] == opponent){
+                if (board[dest.first][dest.second] == opponent)
+                {
                     capture = true;
                 }
                 board[dest.first][dest.second] = turn;
-                //boardPrint();
                 value = minimax(depth - 1, false, alpha, beta);
-                if (value>bestVal && depth == SEARCH_DEPTH){
+                if (value > bestVal && depth == SEARCH_DEPTH)
+                {
                     _move[0][0] = source.first;
                     _move[0][1] = source.second;
                     _move[1][0] = dest.first;
@@ -313,19 +333,19 @@ int minimax(int depth, bool maximizing, int alpha, int beta)
                 alpha = max(alpha, bestVal);
                 board[source.first][source.second] = turn;
                 board[dest.first][dest.second] = (capture) ? opponent : 0;
-                if (beta <= alpha){
+                if (beta <= alpha)
+                {
                     breakLoop = true;
                     break;
                 }
             }
-            if(breakLoop)
+            if (breakLoop)
                 break;
         }
         return bestVal;
     }
     else
     {
-        //cout << "Here1 at depth " << depth << endl;
         int bestVal = PINF;
         vector<pair<pii, vector<pii>>> children = childGen();
         int value;
@@ -334,21 +354,20 @@ int minimax(int depth, bool maximizing, int alpha, int beta)
             bool breakLoop = false;
             pair<pii, vector<pii>> a = children[i];
             pii source = a.first;
-            //cout << "Sorce: " << source.first << " " << source.second << endl;
             vector<pii> moves = a.second;
             for (int j = 0; j < moves.size(); j++)
             {
                 bool capture = false;
                 pii dest = moves[j];
-                //cout << "Dest: " << dest.first << " " << dest.second << endl;
                 board[source.first][source.second] = 0;
-                if(board[dest.first][dest.second] == opponent){
+                if (board[dest.first][dest.second] == opponent)
+                {
                     capture = true;
                 }
                 board[dest.first][dest.second] = turn;
-                //boardPrint();
                 value = minimax(depth - 1, true, alpha, beta);
-                if (value<bestVal && depth == SEARCH_DEPTH){
+                if (value < bestVal && depth == SEARCH_DEPTH)
+                {
                     _move[0][0] = source.first;
                     _move[0][1] = source.second;
                     _move[1][0] = dest.first;
@@ -358,12 +377,13 @@ int minimax(int depth, bool maximizing, int alpha, int beta)
                 beta = min(beta, bestVal);
                 board[source.first][source.second] = turn;
                 board[dest.first][dest.second] = (capture) ? opponent : 0;
-                if (beta <= alpha){
+                if (beta <= alpha)
+                {
                     breakLoop = true;
                     break;
                 }
             }
-            if(breakLoop)
+            if (breakLoop)
                 break;
         }
         return bestVal;
@@ -372,8 +392,65 @@ int minimax(int depth, bool maximizing, int alpha, int beta)
     return 0;
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    mode = atoi(argv[1]);
+    SEARCH_DEPTH = 5;
+    turn = atoi(argv[2]);
+    opponent = atoi(argv[3]);
+    bool maximizing = (turn == 1) ? true : false;
+
+    board = vector<vector<int>>(mode, vector<int>(mode, 0));
+    pieceSquareTable = vector<vector<int>>(mode, vector<int>(mode, 0));
+
+    if (mode == 8)
+    {
+        for (int i = 0; i < mode; i++)
+        {
+            for (int j = 0; j < mode; j++)
+            {
+                pieceSquareTable[i][j] = pieceSquareTableInitial[i][j];
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < mode; i++)
+        {
+            for (int j = 0; j < mode; j++)
+            {
+                pieceSquareTable[i][j] = pieceSquareTableInitial[i + 1][j + 1];
+            }
+        }
+        pieceSquareTable[0][0] = 0;
+        pieceSquareTable[0][mode - 1] = 0;
+        pieceSquareTable[mode - 1][0] = 0;
+        pieceSquareTable[mode - 1][mode - 1] = 0;
+    }
+
+    for (int i = 0; i < mode; i++)
+    {
+        for (int j = 0; j < mode; j++)
+        {
+            if ((i == 0 || i == mode - 1) && (j != 0 || j != mode - 1))
+            {
+                board[i][j] = 2;
+            }
+            else if ((i != 0 || i != mode - 1) && (j == 0 || j == mode - 1))
+            {
+                board[i][j] = 1;
+            }
+            else
+            {
+                board[i][j] = 0;
+            }
+        }
+    }
+    board[0][0] = 0;
+    board[0][mode - 1] = 0;
+    board[mode - 1][0] = 0;
+    board[mode - 1][mode - 1] = 0;
+
     string s;
     int a, b, c, d;
     getline(cin, s);
@@ -381,9 +458,15 @@ int main()
     while (true)
     {
         cin >> a >> b >> c >> d;
-        board[a][b] = 0;
-        board[c][d] = opponent;
-        minimax(SEARCH_DEPTH, false, NINF, PINF);
+        if (a < 0 || b < 0 || c < 0 || d < 0)
+        {
+        }
+        else
+        {
+            board[a][b] = 0;
+            board[c][d] = opponent;
+        }
+        minimax(SEARCH_DEPTH, maximizing, NINF, PINF);
         board[_move[0][0]][_move[0][1]] = 0;
         board[_move[1][0]][_move[1][1]] = turn;
         cout << _move[0][0] << endl;
@@ -391,8 +474,6 @@ int main()
         cout << _move[1][0] << endl;
         cout << _move[1][1] << endl;
     }
-
-    // turn = 2;
 
     return 0;
 }
