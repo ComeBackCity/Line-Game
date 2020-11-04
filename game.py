@@ -1,6 +1,7 @@
 import pygame
 import math
 import sys
+import os
 from queue import Queue
 from sys import stderr
 
@@ -395,7 +396,16 @@ while not gameExit:
     if gameStarted:
         (finished, player) = winCheck()
         if finished:
-            print("Player", player, "has won")
+            if not pve:
+                if player == 2:
+                    os.system('python3 endScreen.py BLUE 1')
+                elif player == 1:
+                    os.system('python3 endScreen.py RED 2')
+            else:
+                if player == me:
+                    os.system('python3 endScreen.py YOU 4')
+                else:
+                    os.system('python3 endScreen.py CPU 3')
             quit()
     
 pygame.quit()
